@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI, Query, Path
 from typing import List
-from question import read_question, add_question, get_maximum_question_id
+from question import before_add_sanity_check, read_question, add_question, get_maximum_question_id
 from answer import read_answer, check_answer
 from pydantic import BaseModel
 from prerequis import read_json, write_json
@@ -16,16 +16,15 @@ app = FastAPI()
 max_question_id = get_maximum_question_id(questions_list)
 
 class QuestionStep(BaseModel): 
-    step: int = 1
+    step: int
     indice: str
+        
+class Answer(BaseModel):
+    text: str="" 
 
 class Question(BaseModel):
     question_content: List[QuestionStep]
-    answer: str
-        
-class Answer(BaseModel):
-    answer: str 
-
+    answer_correct: Answer
 
 # Accueil
 @app.get("/")
@@ -34,11 +33,15 @@ def get_root():
 
 
 ## Ajouter question
-@app.post("/question/propose")
+@app.post("/question/add")
 def create_item(question: Question):
-    updated_question_list = add_question(question.question_content, question.answer, questions_list)
+    sanity_check = before_add_sanity_check(question.question_content, question.answer_correct.text)
+    if not sanity_check["check"]: 
+        return sanity_check["error"]
+
+    updated_question_list = add_question(question.question_content, question.answer_correct.text, questions_list)
     write_json(updated_question_list['questions'], path_list_questions)
-    return updated_question_list["result"]
+    return "QUESTION ADDED"
 
 
 ## Lire question
@@ -46,6 +49,9 @@ def create_item(question: Question):
 def get_question(question_id: int=Path(..., ge=1, le=max_question_id)):
     print('yolo')
     return {"question": read_question(question_id, questions_list)}
+
+## Lire question step by step 
+
 
 ## Réponse question
 @app.get("/question/read/solution/{question_id}")
