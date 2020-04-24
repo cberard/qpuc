@@ -3,6 +3,14 @@ from prerequis import find_items_in_list_dict, write_json
 def transform_question_to_readable_dict(question): 
     return [q.dict() for q in question]
 
+
+def order_question_content(question_content): 
+    question_content_order = question_content.copy()
+    for content in question_content : 
+        question_content_order[content["step"]-1] = content
+    return question_content_order
+
+
 def read_question(question_id, list_questions): 
     
     """
@@ -12,7 +20,7 @@ def read_question(question_id, list_questions):
     question = find_items_in_list_dict({"question_id": question_id}, list_questions)
     if not question : 
         return {"question_content": "QUESTION NOT FOUND", "status":False}
-    return {"question_content" : question['question_content'], "status":True}
+    return {"question_content" : order_question_content(question['question_content']), "status":True}
 
 
 def read_step_in_question(step, question_id, list_question): 
