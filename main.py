@@ -24,7 +24,7 @@ class Question(BaseModel):
     answer: str
         
 class Answer(BaseModel):
-    answer: str = ""
+    answer: str 
 
 
 # Accueil
@@ -43,18 +43,18 @@ def create_item(question: Question):
 
 ## Lire question
 @app.get("/question/read/{question_id}")
-def get_question(question_id: int=Path(..., le=max_question_id)):
+def get_question(question_id: int=Path(..., ge=1, le=max_question_id)):
     print('yolo')
     return {"question": read_question(question_id, questions_list)}
 
 ## Réponse question
 @app.get("/question/read/solution/{question_id}")
-def get_answer(question_id: int=Path(..., le=max_question_id)):
+def get_answer(question_id: int=Path(..., ge=1, le=max_question_id)):
     return {"answer": read_answer(question_id, questions_list)}
 
 ## Répondre à une question
 @app.post("/question/repondre/{question_id}")
-def get_answer(*, question_id:int=Path(..., le=max_question_id), answer: Answer):
+def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), answer: Answer):
     return check_answer(answer.answer, question_id, questions_list)
     
 
