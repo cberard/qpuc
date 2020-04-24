@@ -3,7 +3,7 @@ from fastapi import FastAPI, Query, Path
 from typing import List
 from question import before_add_sanity_check, read_question, add_question, get_maximum_question_id, read_step_in_question
 from answer import read_answer, check_answer
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from prerequis import read_json, write_json
 
 
@@ -15,15 +15,20 @@ app = FastAPI()
 max_question_id = get_maximum_question_id(questions_list)
 
 class QuestionStep(BaseModel): 
-    step: int
-    indice: str
+    step: int = Field(..., example=1)
+    indice: str = Field(..., example="J'apporte des cadeaux sous le sapin", max_length=1000)
         
 class Answer(BaseModel):
-    text: str="" 
+    text: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
 
 class Question(BaseModel):
-    question_content: List[QuestionStep]
-    answer_correct: Answer
+    question_content: List[QuestionStep] = Field(
+        ..., 
+        example=[QuestionStep(step=1, indice="J'apporte des cadeaux sous le sapin"), QuestionStep(step=2, indice="J'entre dans les maisons par la cheminée")], 
+         min_items=1, 
+         max_items=10,
+          title="List of indices guess the correct answer")
+    answer_correct: Answer = Field(..., example="Le père Noël", title="The correct Answer")
 
 # Accueil
 @app.get("/")
