@@ -6,12 +6,31 @@ def transform_question_to_readable_dict(question):
 def read_question(question_id, list_questions): 
     
     """
-    question : int 
+    question_id : int 
+    list_question : BD de question = list of dict
     """
     question = find_items_in_list_dict({"question_id": question_id}, list_questions)
     if not question : 
-        return "QUESTION NOT FOUND"
-    return question['question_content']
+        return {"question_content": "QUESTION NOT FOUND", "status":False}
+    return {"question_content" : question['question_content'], "status":True}
+
+
+def read_step_in_question(step, question_id, list_question): 
+    question = read_question(question_id, list_question)
+    if not question["status"]: 
+        return {"question_content": question["question_content"], "next_step":False, "status": False}
+    
+    question_content = question['question_content']
+    nb_steps = len(question_content)
+    if step <1 or step>nb_steps: 
+        return {"question_content": "STEP UNDIFINED FOR QUESTION #%s"%question_id, "next_step":False, "status":False}
+    
+    text_to_print = []
+
+    for s in range(1, step+1): 
+        text_to_print.append(find_items_in_list_dict({"step":s}, question_content))
+       
+    return {"question_content": text_to_print, "next_step":(step != nb_steps), "status":True}
 
 
 def get_maximum_question_id(questions_list): 
@@ -38,8 +57,6 @@ def before_add_sanity_check(question_content, answer):
 
     return {'check': True, 'error':"ANSWER IS NOT COMPLETED."}
    
-
-
 
 
 def add_question(question_content, answer, questions_list): 
