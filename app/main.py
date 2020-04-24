@@ -1,10 +1,13 @@
 
 from fastapi import FastAPI, Query, Path
-from typing import List
+from typing import List, Dict
 from question import before_add_sanity_check, read_question, add_question, get_maximum_question_id, read_step_in_question
 from answer import read_answer, check_answer
-from pydantic import BaseModel, Field
 from prerequis import read_json, write_json
+from pydantic import BaseModel, Field
+
+#from datetime import datetime, time, timedelta
+#from uuid import UUID
 
 
 path_list_questions = "./questions.json"
@@ -18,8 +21,10 @@ class QuestionStep(BaseModel):
     step: int = Field(..., example=1)
     indice: str = Field(..., example="J'apporte des cadeaux sous le sapin", max_length=1000)
         
+
 class Answer(BaseModel):
     text: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
+
 
 class Question(BaseModel):
     question_content: List[QuestionStep] = Field(
@@ -31,13 +36,13 @@ class Question(BaseModel):
     answer_correct: Answer = Field(..., example="Le père Noël", title="The correct Answer")
 
 # Accueil
-@app.get("/")
+@app.get("/", response_model=Dict[str,str])
 def get_root():
     return {"Hello": "Bienvenue à Question Pour Un Champion"}
 
 
 ## Ajouter question
-@app.post("/question/add")
+@app.post("/question/add", response_model=Dict[str, str])
 def create_item(question: Question):
     sanity_check = before_add_sanity_check(question.question_content, question.answer_correct.text)
     if not sanity_check["check"]: 
