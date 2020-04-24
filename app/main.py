@@ -9,6 +9,19 @@ from pydantic import BaseModel, Field
 #from datetime import datetime, time, timedelta
 #from uuid import UUID
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 path_list_questions = "./questions.json"
 questions_list = read_json(path_list_questions)
