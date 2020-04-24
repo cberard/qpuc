@@ -1,7 +1,7 @@
 
 from fastapi import FastAPI, Query, Path
 from typing import List
-from question import before_add_sanity_check, read_question, add_question, get_maximum_question_id
+from question import before_add_sanity_check, read_question, add_question, get_maximum_question_id, read_step_in_question
 from answer import read_answer, check_answer
 from pydantic import BaseModel
 from prerequis import read_json, write_json
@@ -46,11 +46,12 @@ def create_item(question: Question):
 
 ## Lire question
 @app.get("/question/read/{question_id}")
-def get_question(question_id: int=Path(..., ge=1, le=max_question_id)):
-    print('yolo')
-    return {"question": read_question(question_id, questions_list)}
+def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int=Query(None, ge=1)):
+    if step : 
+        step_found = read_step_in_question(step, question_id, questions_list)
+        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"]}
 
-## Lire question step by step 
+    return {'question':read_question(question_id, questions_list)['question_content']}
 
 
 ## Réponse question
