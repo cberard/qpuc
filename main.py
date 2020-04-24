@@ -1,11 +1,10 @@
 
 from fastapi import FastAPI, Query, Path
 from typing import List
-from question import read_question, add_question, get_maximum_question_id
+from question import before_add_sanity_check, read_question, add_question, get_maximum_question_id, read_step_in_question
 from answer import read_answer, check_answer
 from pydantic import BaseModel
 from prerequis import read_json, write_json
-
 
 
 path_list_questions = "./questions.json"
@@ -16,16 +15,15 @@ app = FastAPI()
 max_question_id = get_maximum_question_id(questions_list)
 
 class QuestionStep(BaseModel): 
-    step: int = 1
+    step: int
     indice: str
+        
+class Answer(BaseModel):
+    text: str="" 
 
 class Question(BaseModel):
     question_content: List[QuestionStep]
-    answer: str
-        
-class Answer(BaseModel):
-    answer: str 
-
+    answer_correct: Answer
 
 # Accueil
 @app.get("/")
@@ -34,18 +32,36 @@ def get_root():
 
 
 ## Ajouter question
-@app.post("/question/propose")
+@app.post("/question/add")
 def create_item(question: Question):
-    updated_question_list = add_question(question.question_content, question.answer, questions_list)
+    sanity_check = before_add_sanity_check(question.question_content, question.answer_correct.text)
+    if not sanity_check["check"]: 
+        return {"status": sanity_check["error"]}
+
+    updated_question_list = add_question(question.question_content, question.answer_correct.text, questions_list)
     write_json(updated_question_list['questions'], path_list_questions)
-    return updated_question_list["result"]
+    return {"status":"QUESTION ADDED"}
 
 
 ## Lire question
 @app.get("/question/read/{question_id}")
-def get_question(question_id: int=Path(..., ge=1, le=max_question_id)):
-    print('yolo')
-    return {"question": read_question(question_id, questions_list)}
+def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int=Query(None, ge=1)):
+    
+    """
+    question_id : the id in the BD of question
+    step (Optional) if used indicates until (inclued) which step we want to read the question
+    If step is not indicated the question is read until the end
+
+    Returns :  {question : the question contents until the (optional) indicated step, 
+                step_forward : True if the question have not been completely read yet, False if there is no step to read left}
+    """
+    
+    if step : 
+        step_found = read_step_in_question(step, question_id, questions_list)
+        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"]}
+
+    return {'question':read_question(question_id, questions_list)['question_content'], 'step_forward': False}
+
 
 ## Réponse question
 @app.get("/question/read/solution/{question_id}")
