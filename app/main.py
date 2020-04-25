@@ -1,9 +1,9 @@
 
 from fastapi import FastAPI, Query, Path
 from typing import List, Dict
-from question import before_add_sanity_check, read_question, add_question, get_maximum_question_id, read_step_in_question
-from answer import read_answer, check_answer
-from prerequis import read_json, write_json
+from app.question import before_add_sanity_check, read_question, add_question, get_maximum_question_id, read_step_in_question
+from app.answer import read_answer, check_answer
+from app.prerequis import read_json, write_json
 from pydantic import BaseModel, Field
 
 #from datetime import datetime, time, timedelta
@@ -25,8 +25,6 @@ app.add_middleware(
 
 path_list_questions = "./questions.json"
 questions_list = read_json(path_list_questions)
-
-app = FastAPI()
 
 max_question_id = get_maximum_question_id(questions_list)
 

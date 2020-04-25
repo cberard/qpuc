@@ -1,4 +1,4 @@
-from prerequis import find_items_in_list_dict, write_json
+from app.prerequis import find_items_in_list_dict, write_json
 
 def transform_question_to_readable_dict(question): 
     return [q.dict() for q in question]

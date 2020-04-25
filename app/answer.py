@@ -1,4 +1,4 @@
-from prerequis import find_items_in_list_dict
+from app.prerequis import find_items_in_list_dict
     
 
 def read_answer(question_id, list_questions): 
