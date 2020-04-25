@@ -44,7 +44,7 @@ class Question(BaseModel):
          min_items=1, 
          max_items=10,
           title="List of indices guess the correct answer")
-    answer_correct: Answer = Field(..., example="Le père Noël", title="The correct Answer")
+    answer_correct: Answer = Field(..., example=Answer(text="Le père Noël"), title="The correct Answer")
 
 # Accueil
 @app.get("/", response_model=Dict[str,str])
@@ -79,7 +79,7 @@ def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int
     
     if step : 
         step_found = read_step_in_question(step, question_id, questions_list)
-        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"], "question_length": step_found["question_length"]}
+        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"], "question_length": step_found["question_lengthto q"]}
 
     question_found = read_question(question_id, questions_list)
     return {'question':question_found['question_content'], "question_length": question_found["question_length"],'step_forward': False}
@@ -88,11 +88,11 @@ def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int
 ## Réponse question
 @app.get("/question/read/solution/{question_id}")
 def get_answer(question_id: int=Path(..., ge=1, le=max_question_id)):
-    return {"answer": read_answer(question_id, questions_list)}
+    return read_answer(question_id, questions_list)
 
 ## Répondre à une question
 @app.post("/question/repondre/{question_id}")
-def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), answer: Answer):
-    return check_answer(answer.answer, question_id, questions_list)
+def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), guessed_answer: Answer):
+    return check_answer(guessed_answer, question_id, questions_list)
     
 
