@@ -19,26 +19,27 @@ def read_question(question_id, list_questions):
     """
     question = find_items_in_list_dict({"question_id": question_id}, list_questions)
     if not question : 
-        return {"question_content": "QUESTION NOT FOUND", "status":False}
-    return {"question_content" : order_question_content(question['question_content']), "status":True}
+        return {"question_content": "QUESTION NOT FOUND", "status":False, "question_length":0}
+    question_content = order_question_content(question['question_content'])
+    return {"question_content" : question_content, "question_length":len(question_content),  "status":True}
 
 
 def read_step_in_question(step, question_id, list_question): 
     question = read_question(question_id, list_question)
     if not question["status"]: 
-        return {"question_content": question["question_content"], "next_step":False, "status": False}
+        return {"question_content": question["question_content"], "next_step":False, "status": False, "question_length":0}
     
     question_content = question['question_content']
     nb_steps = len(question_content)
     if step <1 or step>nb_steps: 
-        return {"question_content": "STEP UNDIFINED FOR QUESTION #%s"%question_id, "next_step":False, "status":False}
+        return {"question_content": "STEP UNDIFINED FOR QUESTION #%s"%question_id, "next_step":False, "status":False, "question_length":nb_steps}
     
     text_to_print = []
 
     for s in range(1, step+1): 
         text_to_print.append(find_items_in_list_dict({"step":s}, question_content))
        
-    return {"question_content": text_to_print, "next_step":(step != nb_steps), "status":True}
+    return {"question_content": text_to_print, "next_step":(step != nb_steps), "question_length": nb_steps, "status":True}
 
 
 def get_maximum_question_id(questions_list): 

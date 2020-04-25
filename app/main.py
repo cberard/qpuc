@@ -23,7 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-path_list_questions = "./questions.json"
+path_list_questions = "./app/questions.json"
 questions_list = read_json(path_list_questions)
 
 max_question_id = get_maximum_question_id(questions_list)
@@ -79,9 +79,10 @@ def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int
     
     if step : 
         step_found = read_step_in_question(step, question_id, questions_list)
-        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"]}
+        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"], "question_length": step_found["question_length"]}
 
-    return {'question':read_question(question_id, questions_list)['question_content'], 'step_forward': False}
+    question_found = read_question(question_id, questions_list)
+    return {'question':question_found['question_content'], "question_length": question_found["question_length"],'step_forward': False}
 
 
 ## Réponse question
