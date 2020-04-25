@@ -34,7 +34,8 @@ class QuestionStep(BaseModel):
         
 
 class Answer(BaseModel):
-    answer_content : str = Field(..., example="Le Père Noël", min_length=2, max_length=100, title="Text answer"); 
+    answer_content : str = Field(..., example="Le Père Noël", min_length=2, max_length=100, title="Text answer") 
+    is_principal : bool = True 
     
 
 class GuessedAnswer(BaseModel):
@@ -46,10 +47,10 @@ class Question(BaseModel):
     question_content: List[QuestionStep] = Field(
         ..., 
         example=[QuestionStep(step=1, indice="J'apporte des cadeaux sous le sapin"), QuestionStep(step=2, indice="J'entre dans les maisons par la cheminée")], 
-         min_items=1, 
-         max_items=10,
-          title="List of indices guess the correct answer")
-    accepted_answers : List[Answer] = Field(..., min_items=1, example=[Answer(answer_content="Le père Noël"), Answer(answer_content="Père Noël")], title="The correct possible Answers")
+        min_items=1, 
+        max_items=10,
+        title="List of indices guess the correct answer")
+    accepted_answers : List[Answer] = Field(..., min_items=1, example=[Answer(answer_content="Le père Noël", is_principal=True), Answer(answer_content="Père Noël", is_principal=False)], title="The correct possible Answers")
 
 # Accueil
 @app.get("/", response_model=Dict[str,str])
@@ -93,7 +94,7 @@ def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int
 ## Réponse question
 @app.get("/question/read/solution/{question_id}")
 def get_answer(question_id: int=Path(..., ge=1, le=max_question_id)):
-    return read_answer(question_id, questions_list)
+    return read_answer(question_id, questions_list, get_all=False)
 
 ## Répondre à une question
 @app.post("/question/repondre/{question_id}")

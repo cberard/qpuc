@@ -1,5 +1,13 @@
 import json
 
+def transform_question_to_readable_dict(question): 
+    return [q.dict() for q in question]
+
+def transform_dict_with_boolean_to_int(d, key_to_transform=[]): 
+    for q in d:     
+        for key in key_to_transform: q[key]=int(q[key])
+    return d
+
 
 def write_json(dic, json_path): 
     with open(json_path, 'w') as outfile: 

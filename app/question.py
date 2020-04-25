@@ -1,8 +1,4 @@
-from app.prerequis import find_items_in_list_dict, write_json
-
-def transform_question_to_readable_dict(question): 
-    return [q.dict() for q in question]
-
+from app.prerequis import find_items_in_list_dict, write_json, transform_question_to_readable_dict, transform_dict_with_boolean_to_int
 
 def order_question_content(question_content): 
     question_content_order = question_content.copy()
@@ -78,7 +74,7 @@ def add_question(question, questions_list):
     question_ready = {
         "question_id": question_id, 
         "question_content": transform_question_to_readable_dict(question_content), 
-        "accepted_answers":transform_question_to_readable_dict(correct_answers)
+        "accepted_answers":transform_dict_with_boolean_to_int(transform_question_to_readable_dict(correct_answers), key_to_transform=['is_principal'])
         }
     questions_list.append(question_ready)
     return {"questions":questions_list}

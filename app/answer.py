@@ -3,7 +3,7 @@ from app.transform_string import transform_text
 from app.check_answer import check_answer_correct
     
 
-def read_answer(question_id, list_questions): 
+def read_answer(question_id, list_questions, get_all=False): 
     
     """
     question : int 
@@ -11,7 +11,16 @@ def read_answer(question_id, list_questions):
     question = find_items_in_list_dict({"question_id": question_id}, list_questions)
     if not question : 
         return {"status": False, 'answer_correct':None, "description":"QUESTION NOT FOUND"}
-    return {"status": True, 'answer_correct':question['accepted_answers']}
+
+    if get_all: 
+        return {"status": True, 'answer_correct':question['accepted_answers']}
+    
+    for answer in question['accepted_answer'] : 
+        if answer['is_principal']: 
+            return {"status": True, 'answer_correct':answer['answer_content']}
+
+    return {"status": False, 'answer_correct':None, "description":"NO PRINCIPAL ANSWER"}
+            
 
 
 #### A modifier
@@ -19,7 +28,7 @@ def read_answer(question_id, list_questions):
 def check_answer(guessed_answer, question_id, list_questions): 
     ### TO DO : ajouter proposer une réponse avec fautes 
     
-    accepted_answers = read_answer(question_id, list_questions)
+    accepted_answers = read_answer(question_id, list_questions, get_all=True)
     if not accepted_answers["status"]: 
         return {'guessed_answer': guessed_answer, "status":False, 'description':"QUESTION NOT FOUND"}
     answers_list = accepted_answers["answer_correct"]
