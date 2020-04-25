@@ -49,34 +49,37 @@ def get_maximum_question_id(questions_list):
     return max([question['question_id'] for question in questions_list])
 
 
-def before_add_sanity_check(question_content, answer):
+def before_add_sanity_check(question):
     ### TO DO 
     ##sanity checks to run on orthographe
     # 1 : Check that question is defined step by step 
-    question_content = transform_question_to_readable_dict(question_content)
-    print(question_content)
+    question_content = transform_question_to_readable_dict(question.question_content)
     nb_steps = len(question_content)
     step_id = set([step["step"] for step in question_content])
     if step_id != set(range(1, nb_steps+1)): 
         return {'check': False, 'error':"SYNTAX ERROR IN QUESTION. QUESTION HAS NOT BEEN ADDED"}
 
     # 2 : Check that answer is fully completed
-    if len(answer)<2 or answer=='string': 
+    answer = transform_question_to_readable_dict(question.accepted_answers)
+    if len(answer)<1 or len(''.join([ans['answer_content'] for ans in answer]))<2: 
         return {'check': False, 'error':"ANSWER IS NOT COMPLETED."}
 
-    return {'check': True, 'error':"ANSWER IS NOT COMPLETED."}
+    return {'check': True, 'error':None}
    
 
 
-def add_question(question_content, answer, questions_list): 
+def add_question(question, questions_list): 
 
+    question_content, correct_answers = question.question_content, question.accepted_answers
     question_id = get_maximum_question_id(questions_list)+1
     
     #question, answer  = before_add_sanity_check(question, answer)
     
-    question_ready = {"question_id": question_id, "question_content": transform_question_to_readable_dict(question_content), "answer":answer}
+    question_ready = {
+        "question_id": question_id, 
+        "question_content": transform_question_to_readable_dict(question_content), 
+        "accepted_answers":transform_question_to_readable_dict(correct_answers)
+        }
     questions_list.append(question_ready)
-
-
     return {"questions":questions_list}
     

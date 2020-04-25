@@ -34,7 +34,12 @@ class QuestionStep(BaseModel):
         
 
 class Answer(BaseModel):
-    text: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
+    answer_content : str = Field(..., example="Le Père Noël", min_length=2, max_length=100, title="Text answer"); 
+    
+
+class GuessedAnswer(BaseModel):
+    answer_content: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
+    duration: str = Field("00:01:00", example="hh:mm:ss", length =8, title="Duration to answer question")
 
 
 class Question(BaseModel):
@@ -44,7 +49,7 @@ class Question(BaseModel):
          min_items=1, 
          max_items=10,
           title="List of indices guess the correct answer")
-    answer_correct: Answer = Field(..., example=Answer(text="Le père Noël"), title="The correct Answer")
+    accepted_answers : List[Answer] = Field(..., min_items=1, example=[Answer(answer_content="Le père Noël"), Answer(answer_content="Père Noël")], title="The correct possible Answers")
 
 # Accueil
 @app.get("/", response_model=Dict[str,str])
@@ -55,11 +60,11 @@ def get_root():
 ## Ajouter question
 @app.post("/question/add", response_model=Dict[str, str])
 def create_item(question: Question):
-    sanity_check = before_add_sanity_check(question.question_content, question.answer_correct.text)
+    sanity_check = before_add_sanity_check(question)
     if not sanity_check["check"]: 
         return {"status": sanity_check["error"]}
 
-    updated_question_list = add_question(question.question_content, question.answer_correct.text, questions_list)
+    updated_question_list = add_question(question, questions_list)
     write_json(updated_question_list['questions'], path_list_questions)
     return {"status":"QUESTION ADDED"}
 
@@ -92,7 +97,7 @@ def get_answer(question_id: int=Path(..., ge=1, le=max_question_id)):
 
 ## Répondre à une question
 @app.post("/question/repondre/{question_id}")
-def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), guessed_answer: Answer):
+def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), guessed_answer: GuessedAnswer):
     return check_answer(guessed_answer, question_id, questions_list)
     
 
