@@ -36,6 +36,9 @@ class QuestionStep(BaseModel):
 class Answer(BaseModel):
     text: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
 
+class GuessedAnswer(BaseModel):
+    text: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
+    time: str = Field("00:01:00", example="hh:mm:ss", length =8, title="Duration to answer question")
 
 class Question(BaseModel):
     question_content: List[QuestionStep] = Field(
@@ -92,7 +95,7 @@ def get_answer(question_id: int=Path(..., ge=1, le=max_question_id)):
 
 ## Répondre à une question
 @app.post("/question/repondre/{question_id}")
-def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), guessed_answer: Answer):
+def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), guessed_answer: GuessedAnswer):
     return check_answer(guessed_answer, question_id, questions_list)
     
 
