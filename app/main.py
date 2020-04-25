@@ -38,7 +38,7 @@ class Answer(BaseModel):
 
 class GuessedAnswer(BaseModel):
     text: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
-    time: str = Field("00:01:00", example="hh:mm:ss", length =8, title="Duration to answer question")
+    duration: str = Field("00:01:00", example="hh:mm:ss", length =8, title="Duration to answer question")
 
 class Question(BaseModel):
     question_content: List[QuestionStep] = Field(
