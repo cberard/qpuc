@@ -22,3 +22,23 @@ docker run -it --name yourContainerName -p 80:80 yourImageName:latest
 Si tout s'est bien passé, la console devrait afficher le message suivant : `[INFO] Listening at: http://0.0.0.0:80 ` (80 étant le port défini lors de la commande `docker run`.
 
 In your navigator go to http://0.0.0.0/
+
+
+## Deploy with heroku using the docker image
+
+You'll need a account created on Heroku 
+
+```
+heroku auth:login
+```
+
+Follow the instructions to get loaded
+
+```
+heroku apps:create qpuc-api
+heroku container:push web
+heroku container:release web
+heroku open
+```
+
+You can now use your API on the given by Heroku 
