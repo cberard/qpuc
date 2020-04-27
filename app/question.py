@@ -53,14 +53,14 @@ def before_add_sanity_check(question):
     nb_steps = len(question_content)
     step_id = set([step["step"] for step in question_content])
     if step_id != set(range(1, nb_steps+1)): 
-        return {'check': False, 'error':"SYNTAX ERROR IN QUESTION. QUESTION HAS NOT BEEN ADDED"}
+        return {'status': False, 'error':"SYNTAX ERROR IN QUESTION. QUESTION HAS NOT BEEN ADDED"}
 
     # 2 : Check that answer is fully completed
     answer = transform_question_to_readable_dict(question.accepted_answers)
     if len(answer)<1 or len(''.join([ans['answer_content'] for ans in answer]))<2: 
-        return {'check': False, 'error':"ANSWER IS NOT COMPLETED."}
+        return {'status': False, 'error':"ANSWER IS NOT COMPLETED."}
 
-    return {'check': True, 'error':None}
+    return {'status': True}
    
 
 
