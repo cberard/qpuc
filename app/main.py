@@ -1,5 +1,5 @@
 
-from fastapi import FastAPI, Query, Path
+from fastapi import FastAPI, Query, Path, status
 from typing import List, Dict
 from app.question import before_add_sanity_check, read_question, add_question, get_maximum_question_id, read_step_in_question
 from app.answer import read_answer, check_answer
@@ -86,13 +86,13 @@ class CheckAnswer(BaseModel):
 
 
 # Accueil
-@app.get("/")
+@app.get("/", status_code=status.HTTP_100_CONTINUE)
 def get_root():
     return {"Hello": "Bienvenue à Question Pour Un Champion"}
 
 
 ## Ajouter question
-@app.post("/question/add", response_model=PostRequestAnswer, response_model_exclude_unset=True)
+@app.post("/question/add", response_model=PostRequestAnswer, response_model_exclude_unset=True, status_code=status.HTTP_201_CREATED)
 def create_item(question: Question):
     sanity_check = before_add_sanity_check(question)
     if not sanity_check["status"]: 
@@ -106,7 +106,7 @@ def create_item(question: Question):
 
 ## Lire question     
 
-@app.get("/question/read/{question_id}", response_model=ReadQuestion, response_model_exclude_unset=True)
+@app.get("/question/read/{question_id}", response_model=ReadQuestion, response_model_exclude_unset=True, status_code=status.HTTP_200_OK)
 def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int=Query(None, ge=1)):
     
     """
@@ -127,14 +127,14 @@ def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int
 
 
 ## Réponse question
-@app.get("/question/read/solution/{question_id}", response_model=ReadAnswer, response_model_exclude_unset=True)
+@app.get("/question/read/solution/{question_id}", response_model=ReadAnswer, response_model_exclude_unset=True, status_code=status.HTTP_200_OK)
 def get_answer(question_id: int=Path(..., ge=1, le=max_question_id)):
     response =  read_answer(question_id, questions_list, get_all=False)
     print(response)
     return response
 
 ## Répondre à une question
-@app.post("/question/repondre/{question_id}", response_model=CheckAnswer, response_model_exclude_unset=True)
+@app.post("/question/repondre/{question_id}", response_model=CheckAnswer, response_model_exclude_unset=True, status_code=status.HTTP_200_OK)
 def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), guessed_answer: GuessedAnswer):
     return check_answer(guessed_answer, question_id, questions_list)
     
