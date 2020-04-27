@@ -28,6 +28,8 @@ questions_list = read_json(path_list_questions)
 
 max_question_id = get_maximum_question_id(questions_list)
 
+
+## Request Models
 class QuestionStep(BaseModel): 
     step: int = Field(..., example=1)
     indice: str = Field(..., example="J'apporte des cadeaux sous le sapin", max_length=1000)
@@ -37,13 +39,8 @@ class Answer(BaseModel):
     answer_content : str = Field(..., example="Le Père Noël", min_length=2, max_length=100, title="Text answer") 
     is_principal : bool = True 
     
-
 class GuessedAnswer(BaseModel):
     answer_content: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
-    duration: str = Field("00:01:00", example="hh:mm:ss", length =8, title="Duration to answer question")
-
-class GuessedAnswer(BaseModel):
-    text: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
     duration: str = Field("00:01:00", example="hh:mm:ss", length =8, title="Duration to answer question")
 
 class Question(BaseModel):
@@ -55,26 +52,61 @@ class Question(BaseModel):
         title="List of indices guess the correct answer")
     accepted_answers : List[Answer] = Field(..., min_items=1, example=[Answer(answer_content="Le père Noël", is_principal=True), Answer(answer_content="Père Noël", is_principal=False)], title="The correct possible Answers")
 
+
+### Response models
+class ReadQuestion(BaseModel): 
+    question: List[QuestionStep] = Field(
+        ..., 
+        example=[
+            QuestionStep(step=1, indice="J'apporte des cadeaux sous le sapin"), 
+            QuestionStep(step=2, indice="J'entre dans les maisons par la cheminée")])
+            
+    question_length : int = Field(..., example=2)
+    step_forward : bool = False
+
+
+class PostRequestAnswer(BaseModel): 
+    status : bool = Field(..., example=False, title='Indicates whether the post request could be made')
+    error : str = Field(None, example="Answer not completed", title='Type of error if status is false')
+    description : str=Field(None, example='Question has not been added')
+
+
+class ReadAnswer(BaseModel):
+    answer_correct : str = Field(None, example="Le Père Noël", title="Principal answer") 
+    status : bool = Field(..., example=True, title='Declares whether the principal answer was found')
+    error : str = Field(None, title="Error explanation if principal answer was not found")
+
+
+class CheckAnswer(BaseModel):
+    guessed_answer : Answer = Field(..., example='Le Père Noël', title ="Answer guessed by the user")
+    eval_answer : bool = Field(True, example=True, title="Indicates whether the guessed answer is corrected") 
+    status : bool = Field(..., example=True, title='Declares whether the guessed answer was an accepted answer')
+    error : str = Field(None, title="Error explanation")
+
+
+
 # Accueil
-@app.get("/", response_model=Dict[str,str])
+@app.get("/")
 def get_root():
     return {"Hello": "Bienvenue à Question Pour Un Champion"}
 
 
 ## Ajouter question
-@app.post("/question/add", response_model=Dict[str, str])
+@app.post("/question/add", response_model=PostRequestAnswer, response_model_exclude_unset=True)
 def create_item(question: Question):
     sanity_check = before_add_sanity_check(question)
-    if not sanity_check["check"]: 
-        return {"status": sanity_check["error"]}
+    if not sanity_check["status"]: 
+        sanity_check["descrition"] = "Question has not been added"
+        return sanity_check
 
     updated_question_list = add_question(question, questions_list)
     write_json(updated_question_list['questions'], path_list_questions)
-    return {"status":"QUESTION ADDED"}
+    return {'status':True, "description" : 'Question has been added'}
 
 
-## Lire question
-@app.get("/question/read/{question_id}")
+## Lire question     
+
+@app.get("/question/read/{question_id}", response_model=ReadQuestion, response_model_exclude_unset=True)
 def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int=Query(None, ge=1)):
     
     """
@@ -88,20 +120,21 @@ def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int
     
     if step : 
         step_found = read_step_in_question(step, question_id, questions_list)
-        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"], "question_length": step_found["question_lengthto q"]}
+        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"], "question_length": step_found["question_length"]}
 
     question_found = read_question(question_id, questions_list)
-    return {'question':question_found['question_content'], "question_length": question_found["question_length"],'step_forward': False}
+    return {'question':question_found['question_content'], "question_length": question_found["question_length"]}
 
 
 ## Réponse question
-@app.get("/question/read/solution/{question_id}")
+@app.get("/question/read/solution/{question_id}", response_model=ReadAnswer, response_model_exclude_unset=True)
 def get_answer(question_id: int=Path(..., ge=1, le=max_question_id)):
-    return read_answer(question_id, questions_list, get_all=False)
+    response =  read_answer(question_id, questions_list, get_all=False)
+    print(response)
+    return response
 
 ## Répondre à une question
-@app.post("/question/repondre/{question_id}")
+@app.post("/question/repondre/{question_id}", response_model=CheckAnswer, response_model_exclude_unset=True)
 def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), guessed_answer: GuessedAnswer):
     return check_answer(guessed_answer, question_id, questions_list)
     
-

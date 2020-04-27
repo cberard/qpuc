@@ -10,16 +10,17 @@ def read_answer(question_id, list_questions, get_all=False):
     """
     question = find_items_in_list_dict({"question_id": question_id}, list_questions)
     if not question : 
-        return {"status": False, 'answer_correct':None, "description":"QUESTION NOT FOUND"}
+        return {"status": False, 'answer_correct':None, "error":"QUESTION NOT FOUND"}
 
     if get_all: 
         return {"status": True, 'answer_correct':question['accepted_answers']}
     
-    for answer in question['accepted_answer'] : 
+    for answer in question['accepted_answers'] : 
+        print(answer)
         if answer['is_principal']: 
             return {"status": True, 'answer_correct':answer['answer_content']}
 
-    return {"status": False, 'answer_correct':None, "description":"NO PRINCIPAL ANSWER"}
+    return {"status": False, 'answer_correct':None, "error":"NO PRINCIPAL ANSWER"}
             
 
 
@@ -30,7 +31,7 @@ def check_answer(guessed_answer, question_id, list_questions):
     
     accepted_answers = read_answer(question_id, list_questions, get_all=True)
     if not accepted_answers["status"]: 
-        return {'guessed_answer': guessed_answer, "status":False, 'description':"QUESTION NOT FOUND"}
+        return {'guessed_answer': guessed_answer, "status":False, 'error':"QUESTION NOT FOUND"}
     answers_list = accepted_answers["answer_correct"]
     guessed_answer_cleaned = transform_text(guessed_answer.answer_content)
     for answer in answers_list: 
