@@ -15,7 +15,8 @@ def read_answer(question_id, list_questions, get_all=False):
     if get_all: 
         return {"status": True, 'answer_correct':question['accepted_answers']}
     
-    for answer in question['accepted_answer'] : 
+    for answer in question['accepted_answers'] : 
+        print(answer)
         if answer['is_principal']: 
             return {"status": True, 'answer_correct':answer['answer_content']}
 

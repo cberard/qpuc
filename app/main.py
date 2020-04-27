@@ -37,15 +37,14 @@ class Answer(BaseModel):
     answer_content : str = Field(..., example="Le Père Noël", min_length=2, max_length=100, title="Text answer") 
     is_principal : bool = True 
     
+class ReadAnswer(BaseModel):
+    answer_correct : str = Field(None, example="Le Père Noël", title="Principal answer") 
+    status : bool = Field(..., example=True, title='Declares whether the principal answer was found')
+    description : str = Field(None, title="Error explanation if principal answer was not found")
 
 class GuessedAnswer(BaseModel):
     answer_content: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
     duration: str = Field("00:01:00", example="hh:mm:ss", length =8, title="Duration to answer question")
-
-class GuessedAnswer(BaseModel):
-    text: str = Field(..., example="Le Père Noël", max_length=100, title="Text guessed for the answer")
-    duration: str = Field("00:01:00", example="hh:mm:ss", length =8, title="Duration to answer question")
-
 
 class Question(BaseModel):
     question_content: List[QuestionStep] = Field(
@@ -90,7 +89,6 @@ def create_item(question: Question):
 
 ## Lire question
 
-
       
 
 @app.get("/question/read/{question_id}", response_model=ReadQuestion)
@@ -107,20 +105,21 @@ def get_question(question_id: int=Path(..., ge=1, le=max_question_id), step: int
     
     if step : 
         step_found = read_step_in_question(step, question_id, questions_list)
-        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"], "question_length": step_found["question_lengthto q"]}
+        return {'question': step_found["question_content"], 'step_forward': step_found["next_step"], "question_length": step_found["question_length"]}
 
     question_found = read_question(question_id, questions_list)
     return {'question':question_found['question_content'], "question_length": question_found["question_length"]}
 
 
 ## Réponse question
-@app.get("/question/read/solution/{question_id}")
+@app.get("/question/read/solution/{question_id}", response_model=ReadAnswer, response_model_exclude_unset=True)
 def get_answer(question_id: int=Path(..., ge=1, le=max_question_id)):
-    return read_answer(question_id, questions_list, get_all=False)
+    response =  read_answer(question_id, questions_list, get_all=False)
+    print(response)
+    return response
 
 ## Répondre à une question
 @app.post("/question/repondre/{question_id}")
 def propose_answer(*, question_id:int=Path(..., ge=1, le=max_question_id), guessed_answer: GuessedAnswer):
     return check_answer(guessed_answer, question_id, questions_list)
     
-
