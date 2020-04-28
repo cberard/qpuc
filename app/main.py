@@ -1,5 +1,6 @@
 
 from fastapi import FastAPI, Query, Path, status, HTTPException
+from fastapi.encoders import jsonable_encoder
 from typing import List, Dict
 from app.question import before_add_sanity_check, read_question, add_question, get_maximum_question_id, read_step_in_question
 from app.answer import read_answer, check_answer
@@ -97,6 +98,7 @@ def get_root():
     status_code=status.HTTP_201_CREATED, tags=['questions'], summary="Add a question to DB")
 
 def create_item(question: Question):
+    question = jsonable_encoder(question)
     sanity_check = before_add_sanity_check(question)
     if not sanity_check["status"]: 
         if sanity_check['error']=="syntax_error": 
