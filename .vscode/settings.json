@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "/Users/claraberard/miniconda3/envs/qpuc/bin/python",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true
+}
