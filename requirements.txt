@@ -2,6 +2,7 @@ python-Levenshtein
 unidecode
 python-multipart
 pyjwt
-'passlib[bcrypt]'
+passlib[bcrypt]==1.7.1
 sqlalchemy
-async-exit-stack async-generator
+async-exit-stack 
+async-generator
