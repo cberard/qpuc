@@ -12,6 +12,7 @@ def get_question(db: Session, question_id: int):
 def get_questions(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Question).options(joinedload('steps')).order_by(asc(models.Step.step)).options(joinedload('answers')).offset(skip).limit(limit).all()
 
+
 def create_question(db: Session, question_length:int, owner_id:int):
     datetime_creation = datetime.now()
     question = schemas.QuestionCreate(question_length=question_length, datetime=datetime_creation)
