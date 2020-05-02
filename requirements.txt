@@ -8,3 +8,4 @@ async-exit-stack
 async-generator
 gunicorn
 uvicorn
+fastapi
