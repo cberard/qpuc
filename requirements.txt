@@ -4,4 +4,4 @@ python-multipart
 pyjwt
 'passlib[bcrypt]'
 sqlalchemy
-pip install async-exit-stack async-generator
+async-exit-stack async-generator
