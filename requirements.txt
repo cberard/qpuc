@@ -7,3 +7,4 @@ sqlalchemy
 async-exit-stack 
 async-generator
 gunicorn
+uvicorn
