@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
-from sql_app.database import Base
+from sql_database.database import Base
 
 
 class User(Base):
@@ -22,7 +22,7 @@ class Question(Base):
     __tablename__ = "questions"
     id = Column(Integer, primary_key=True, index=True)
     datetime = Column(DateTime, index=True)
-    nb_steps = Column(Integer, nullable=False)
+    question_length = Column(Integer, nullable=False)
     owner_id = Column(Integer, ForeignKey("users.id"))
 
     owner = relationship("User", back_populates="questions")

@@ -39,7 +39,7 @@ class Answer(AnswerBase):
 #### QUESTION
 class QuestionBase(BaseModel): 
     datetime : datetime
-    nb_steps : int
+    question_length : int
     
 
 class QuestionCreate(QuestionBase): 
