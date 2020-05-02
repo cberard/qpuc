@@ -1,2 +1,7 @@
 python-Levenshtein
 unidecode
+python-multipart
+pyjwt
+'passlib[bcrypt]'
+sqlalchemy
+pip install async-exit-stack async-generator
