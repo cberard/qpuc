@@ -69,7 +69,6 @@ def add_question(question, questions_list):
     question_content, correct_answers = question['question_content'], question['accepted_answers']
     question_id = get_maximum_question_id(questions_list)+1
     
-    
     question_ready = {
         "question_id": question_id, 
         "question_content": question_content, 
@@ -77,4 +76,9 @@ def add_question(question, questions_list):
         }
     questions_list.append(question_ready)
     return {"questions":questions_list}
+
+
+#def update_question(question_id, question_content, list_questions): 
+# TO DO 
+
     
