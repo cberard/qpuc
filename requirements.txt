@@ -6,3 +6,4 @@ passlib[bcrypt]==1.7.1
 sqlalchemy
 async-exit-stack 
 async-generator
+gunicorn
