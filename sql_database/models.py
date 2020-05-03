@@ -16,6 +16,7 @@ class User(Base):
     if_redac = Column(Boolean, default=True)
 
     questions = relationship("Question", back_populates="owner")
+    guessed_answers = relationship("GuessedAnswer", back_populates="user")
 
 
 class Question(Base): 
@@ -28,6 +29,7 @@ class Question(Base):
     owner = relationship("User", back_populates="questions")
     steps = relationship("Step", back_populates="question")
     answers = relationship("Answer", back_populates="question")
+    guessed_answers = relationship("GuessedAnswer", back_populates="question")
 
 
 class Step(Base): 
@@ -48,4 +50,21 @@ class Answer(Base):
     question_id = Column(Integer, ForeignKey("questions.id"))
     
     question = relationship("Question", back_populates="answers")
+
+
+class GuessedAnswer(Base): 
+    __tablename__ = "guessed_answers"
+    id = Column(Integer, primary_key=True, index=True)
+    guessed_answer = Column(String, nullable=False)
+    time_answer = Column(String, nullable=False)
+    is_correct = Column(Boolean, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    question_id = Column(Integer, ForeignKey("questions.id"))
+
+    user = relationship("User", back_populates="guessed_answers")
+    question = relationship("Question", back_populates="guessed_answers")
+    
+
+    
+    
 
