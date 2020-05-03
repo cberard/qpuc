@@ -15,10 +15,10 @@ def get_answers_question(db: Session, question_id: int, skip:int=0, limit:int=10
 
 ### Check if proposed answer is corrected 
 def check_is_answer_is_correct(
-    guessed_answer:schemas.GuessedAnswerCreate, 
+    guessed_answer:str, 
     answer_correct:List[schemas.Answer]): 
     
-    guessed_answer_cleaned = transform_text(guessed_answer.guessed_answer)
+    guessed_answer_cleaned = transform_text(guessed_answer)
     for answer in answer_correct: 
         answer_cleaned = transform_text(answer.answer)
         if check_answer_correct(guessed_answer_cleaned, answer_cleaned): 
@@ -32,8 +32,8 @@ def create_guessed_answer(
     question_id: int,
     user_id:int, 
     true_answers=List[schemas.Answer]): 
-    is_correct = check_is_answer_is_correct(guessed_answer=guessed_answer, answer_correct=true_answers)
-    db_guessed_answer = models.Question(**guessed_answer.dict(), user_id=user_id, question_id=question_id, is_correct=is_correct)
+    is_correct = check_is_answer_is_correct(guessed_answer=guessed_answer.guessed_answer, answer_correct=true_answers)
+    db_guessed_answer = models.GuessedAnswer(**guessed_answer.dict(), user_id=user_id, question_id=question_id, is_correct=is_correct)
     db.add(db_guessed_answer)
     db.commit()
     db.refresh(db_guessed_answer)
