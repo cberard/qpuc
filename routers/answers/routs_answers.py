@@ -34,3 +34,11 @@ async def guess_answer_for_question(guessed_answer:schemas.GuessedAnswerCreate, 
 
     return crud_answers.create_guessed_answer(db=db, guessed_answer=guessed_answer, question_id=question_id, user_id=user_id, true_answers=db_accepted_answers)
 
+
+@router.get("/user/{user_id}", response_model = List[schemas.GuessedAnswer])
+async def read_user_correct_answers(user_id:int, db: Session = Depends(get_db), skip:int=0, limit:int=100):
+    db_user = get_user(db=db, user_id=user_id)
+    if not db_user: 
+        raise HTTPException(status_code=400, detail="User does not exist")
+
+    return crud_answers.get_user_correct_answers(db=db, user_id=user_id, skip=skip, limit=limit)

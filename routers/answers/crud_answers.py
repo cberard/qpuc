@@ -39,3 +39,11 @@ def create_guessed_answer(
     db.refresh(db_guessed_answer)
     return db_guessed_answer
 
+### Get Answers for user 
+def get_user_answers(db: Session, user_id:int, skip:int, limit:int): 
+    return db.query(models.GuessedAnswer).filter(models.GuessedAnswer.user_id == user_id).offset(skip).limit(limit).all()
+
+
+### Get Correct Answers for user 
+def get_user_correct_answers(db: Session, user_id:int, skip:int, limit:int): 
+    return db.query(models.GuessedAnswer).filter((models.GuessedAnswer.user_id == user_id)&(models.GuessedAnswer.is_correct)).offset(skip).limit(limit).all()
