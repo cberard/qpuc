@@ -51,7 +51,9 @@ def create_question_for_user(
 
 
 
-@router.get("/{user_id}", response_model=List[schemas.Question])
+
+
+@router.get("/user/{user_id}", response_model=List[schemas.Question])
 async def get_user_questions(user_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     db_owner = crud_users.get_user(db=db, user_id=user_id)
     #print('Owner', db_owner)
@@ -65,7 +67,6 @@ async def get_user_questions(user_id: int, skip: int = 0, limit: int = 100, db: 
     if db_owner is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    #db_questions = db.fetch_all(query(models.Question).filter(models.Question.owner_id==2).offset(0).limit(100).all())
     db_questions = crud_questions.get_user_questions(db=db, owner_id=user_id, skip=skip, limit=limit)   
 
     return db_questions
