@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session, relationship, joinedload
-from datetime import datetime
+from datetime import date
 from sql_database import models, schemas
-from sqlalchemy import asc
+from sqlalchemy import asc, cast, Date, DateTime
+from sqlalchemy.dialects.mssql import DATE
 from .utils_questions import datetime_is_today
+from datetime import datetime
 
 
 ### Get all question
@@ -16,8 +18,8 @@ def get_questions(db: Session, skip: int = 0, limit: int = 100):
 
 ### Create question
 def create_question(db: Session, question_length:int, owner_id:int):
-    datetime_creation = datetime.now()
-    question = schemas.QuestionCreate(question_length=question_length, datetime=datetime_creation)
+    date_creation = date.today()
+    question = schemas.QuestionCreate(question_length=question_length, date_creation=date_creation)
     db_question = models.Question(**question.dict(), owner_id=owner_id)
     db.add(db_question)
     db.commit()
@@ -60,6 +62,5 @@ def get_user_questions_to_answer(db: Session, user_id: int, skip: int=0, limit: 
 ### Get Question of the day not answered by user
 def get_user_questions_to_answer_today(db: Session, user_id: int): 
     db_answer_user_correct = db.query(models.GuessedAnswer.question_id).filter(models.GuessedAnswer.is_correct, models.GuessedAnswer.user_id==user_id)
-    db_question = db.query(models.Question).filter(datetime_is_today(models.Question.datetime), models.Question.id.notin_(db_answer_user_correct), models.Question.owner_id!=user_id).options(joinedload('steps')).first()
+    db_question = db.query(models.Question).filter(models.Question.date_creation==date.today(), models.Question.id.notin_(db_answer_user_correct), models.Question.owner_id!=user_id).options(joinedload('steps')).first()
     return db_question
-

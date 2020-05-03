@@ -1,6 +1,6 @@
 from typing import List
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import date
 
 #### STEP
 class StepBase(BaseModel): 
@@ -56,7 +56,7 @@ class GuessedAnswer(GuessedAnswerBase):
 
 #### QUESTION
 class QuestionBase(BaseModel): 
-    datetime : datetime
+    date_creation : date
     question_length : int
     
 
