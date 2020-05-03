@@ -58,8 +58,9 @@ class GuessedAnswer(Base):
     guessed_answer = Column(String, nullable=False)
     time_answer = Column(String, nullable=False)
     is_correct = Column(Boolean, nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id"))
     question_id = Column(Integer, ForeignKey("questions.id"))
+    user_id = Column(Integer, ForeignKey("users.id"))
+    
 
     user = relationship("User", back_populates="guessed_answers")
     question = relationship("Question", back_populates="guessed_answers")

@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session, relationship, joinedload
 from datetime import datetime
 from sql_database import models, schemas
 from sqlalchemy import asc
+from .utils_questions import datetime_is_today
 
 
 ### Get all question
@@ -47,5 +48,18 @@ def get_owner_questions(db: Session, owner_id: int, skip: int=0, limit: int=100)
 
 ### Get Questions not made by user 
 def get_user_questions_not_owned(db: Session, user_id: int, skip: int=0, limit: int=100): 
-    db_questions = db.query(models.Question).filter(models.Question.owner_id != user_id).options(joinedload('steps')).options(joinedload('answers')).offset(skip).limit(limit).all()
+    db_questions = db.query(models.Question).filter(models.Question.owner_id != user_id).options(joinedload('steps')).offset(skip).limit(limit).all()
     return db_questions
+
+### Get Questions not answered by user
+def get_user_questions_to_answer(db: Session, user_id: int, skip: int=0, limit: int=100): 
+    db_answer_user_correct = db.query(models.GuessedAnswer.question_id).filter(models.GuessedAnswer.is_correct, models.GuessedAnswer.user_id==user_id)
+    db_questions = db.query(models.Question).filter(models.Question.id.notin_(db_answer_user_correct), models.Question.owner_id!=user_id).options(joinedload('steps')).offset(skip).limit(limit).all()
+    return db_questions
+
+### Get Question of the day not answered by user
+def get_user_questions_to_answer_today(db: Session, user_id: int): 
+    db_answer_user_correct = db.query(models.GuessedAnswer.question_id).filter(models.GuessedAnswer.is_correct, models.GuessedAnswer.user_id==user_id)
+    db_question = db.query(models.Question).filter(datetime_is_today(models.Question.datetime), models.Question.id.notin_(db_answer_user_correct), models.Question.owner_id!=user_id).options(joinedload('steps')).first()
+    return db_question
+

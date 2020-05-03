@@ -64,6 +64,14 @@ class QuestionCreate(QuestionBase):
     pass    
 
 
+class QuestionShow(QuestionBase): 
+    id : int
+    owner_id : int
+    steps: List[Step] = []
+       
+    class Config:
+        orm_mode = True
+
 class Question(QuestionBase): 
     id : int
     owner_id : int
