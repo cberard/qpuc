@@ -72,6 +72,7 @@ class QuestionShow(QuestionBase):
     class Config:
         orm_mode = True
 
+
 class Question(QuestionBase): 
     id : int
     owner_id : int
