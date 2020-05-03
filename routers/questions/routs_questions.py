@@ -53,20 +53,22 @@ def create_question_for_user(
 
 
 
-@router.get("/user/{user_id}", response_model=List[schemas.Question])
-async def get_user_questions(user_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    db_owner = crud_users.get_user(db=db, user_id=user_id)
-    #print('Owner', db_owner)
-    #print('Question', db_owner.questions)
-    #for q in db_owner.questions: 
-    #    for s in q.steps : 
-    #        print("step", s.step, s.indice)
-    #    for a in q.answers : 
-    #        print("answer", a.is_principal, a.answer)
-    
+@router.get("/me/owned", response_model=List[schemas.Question])
+async def read_owner_questions(owner_id:int, skip: int = 0,  limit: int = 100, db: Session = Depends(get_db)):
+    db_owner = crud_users.get_user(db=db, user_id=owner_id)
     if db_owner is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    db_questions = crud_questions.get_user_questions(db=db, owner_id=user_id, skip=skip, limit=limit)   
+    db_questions = crud_questions.get_owner_questions(db=db, owner_id=owner_id, skip=skip, limit=limit)   
+
+    return db_questions
+
+@router.get("/me/not_owned", response_model=List[schemas.Question])
+async def read_user_questions_not_owned(user_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    db_owner = crud_users.get_user(db=db, user_id=user_id)
+    if db_owner is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db_questions = crud_questions.get_user_questions_not_owned(db=db, user_id=user_id, skip=skip, limit=limit)   
 
     return db_questions
