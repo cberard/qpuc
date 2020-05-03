@@ -13,12 +13,29 @@ def get_answers_question(db: Session, question_id: int, skip:int=0, limit:int=10
     return db.query(models.Answer).filter(models.Answer.question_id == question_id).offset(skip).limit(limit).all()
 
 
-def check_is_answer_is_correct(answer_correct:List[schemas.Answer], db:Session, question_id:int, proposed_answer:str): 
+### Check if proposed answer is corrected 
+def check_is_answer_is_correct(
+    guessed_answer:str, 
+    answer_correct:List[schemas.Answer]): 
     
-    guessed_answer_cleaned = transform_text(proposed_answer)
+    guessed_answer_cleaned = transform_text(guessed_answer)
     for answer in answer_correct: 
         answer_cleaned = transform_text(answer.answer)
         if check_answer_correct(guessed_answer_cleaned, answer_cleaned): 
             return True
     return False
-    
+
+
+def create_guessed_answer(
+    db: Session, 
+    guessed_answer: schemas.GuessedAnswerCreate, 
+    question_id: int,
+    user_id:int, 
+    true_answers=List[schemas.Answer]): 
+    is_correct = check_is_answer_is_correct(guessed_answer=guessed_answer.guessed_answer, answer_correct=true_answers)
+    db_guessed_answer = models.GuessedAnswer(**guessed_answer.dict(), user_id=user_id, question_id=question_id, is_correct=is_correct)
+    db.add(db_guessed_answer)
+    db.commit()
+    db.refresh(db_guessed_answer)
+    return db_guessed_answer
+

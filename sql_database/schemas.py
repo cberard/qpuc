@@ -35,6 +35,24 @@ class Answer(AnswerBase):
        orm_mode = True
 
 
+#### GUESSED ANSWER
+class GuessedAnswerBase(BaseModel): 
+    guessed_answer : str
+    time_answer : str
+
+class GuessedAnswerCreate(GuessedAnswerBase): 
+    pass
+
+class GuessedAnswer(GuessedAnswerBase): 
+    id : int
+    question_id : int
+    user_id : int
+    is_correct : bool
+
+    class Config:
+       orm_mode = True
+
+
 
 #### QUESTION
 class QuestionBase(BaseModel): 
