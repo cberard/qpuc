@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session, relationship, joinedload
 from datetime import date
-from sql_database import models, schemas
+from qpuc_app.sql_database import models, schemas
 from sqlalchemy import asc, cast, Date, DateTime
 from sqlalchemy.dialects.mssql import DATE
-from .utils_questions import datetime_is_today
+from qpuc_app.routers.questions.utils_questions import datetime_is_today
 from datetime import datetime
 
 

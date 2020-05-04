@@ -3,11 +3,11 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from sql_database import schemas, models
-from sql_database.utils import get_db
+from qpuc_app.sql_database import schemas, models
+from qpuc_app.sql_database.utils import get_db
 from datetime import datetime
 from . import crud_questions
-from routers.users import crud_users 
+from qpuc_app.routers.users import crud_users 
 
 
 router = APIRouter()

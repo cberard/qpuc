@@ -1,4 +1,4 @@
-from sql_database.database import SessionLocal
+from qpuc_app.sql_database.database import SessionLocal
 
 
 def get_db():

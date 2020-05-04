@@ -1,20 +1,26 @@
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 
 
-from routers import questions
-from routers.users import routs_users 
-from routers.questions import routs_questions
-from routers.answers import routs_answers
-from routers.authentification import routs_authentification
-from sql_database import models
-from sql_database.database import SessionLocal, engine
+
+from qpuc_app.routers.users import routs_users 
+from qpuc_app.routers.questions import routs_questions
+from qpuc_app.routers.answers import routs_answers
+from qpuc_app.routers.authentification import routs_authentification
+from qpuc_app.sql_database import models
+from qpuc_app.sql_database.database import SessionLocal, engine
 
 
 from fastapi.middleware.cors import CORSMiddleware
 import time
+import jwt 
+
 
 
 models.Base.metadata.create_all(bind=engine)
+
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/")
 
 app = FastAPI()
 
@@ -64,3 +70,4 @@ app.include_router(
     tags=["answers"])#,
     #dependencies=[Depends(get_token_header)],
     #responses={404: {"description": "Not found"}})
+

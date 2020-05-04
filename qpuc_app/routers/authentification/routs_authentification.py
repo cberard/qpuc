@@ -1,18 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from routers.users.crud_users import get_user_by_email
+from qpuc_app.routers.users.crud_users import get_user_by_email
 from sqlalchemy.orm import Session
-from sql_database import schemas
+from qpuc_app.sql_database import schemas
 from . import crud_authentification
 from . import constants
 from datetime import timedelta
-from sql_database.utils import get_db
+from qpuc_app.sql_database.utils import get_db
+
+
 
 router = APIRouter()
 
 @router.post("/", response_model=schemas.Token)
 async def login(*, form_data : OAuth2PasswordRequestForm=Depends(), db: Session=Depends(get_db)): 
-    db_user = crud_authentification.authenticate_user(db=db, email=form_data.username, password=form_data.password)
+    db_user = crud_authentification.authentificate_user(db=db, email=form_data.username, password=form_data.password)
     if not db_user: 
         raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -29,3 +31,5 @@ async def login(*, form_data : OAuth2PasswordRequestForm=Depends(), db: Session=
         )
 
     return {"access_token": access_token, "token_type": "bearer"}
+
+

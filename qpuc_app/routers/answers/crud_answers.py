@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from sql_database import models, schemas
+from qpuc_app.sql_database import models, schemas
 from sqlalchemy.orm import relationship, joinedload
-from .utils_answer import transform_text, check_answer_correct
+from qpuc_app.routers.answers.utils_answer import transform_text, check_answer_correct
 from typing import List
 
 

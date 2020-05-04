@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, func
 from sqlalchemy.orm import relationship
 
-from sql_database.database import Base
+from qpuc_app.sql_database.database import Base
 
 
 class User(Base):
