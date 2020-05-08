@@ -2,6 +2,17 @@ from typing import List
 from pydantic import BaseModel, Field
 from datetime import date
 
+
+#### TOKEN
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    email : str = None
+
+
 #### STEP
 class StepBase(BaseModel): 
     step : int

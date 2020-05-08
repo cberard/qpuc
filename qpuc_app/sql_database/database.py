@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 #    DATABASE_URL, connect_args={"check_same_thread": False}
 #)
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_database/sql.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///qpuc_app/sql_database/sql.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
 
