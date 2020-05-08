@@ -72,6 +72,7 @@ async def read_user_questions_not_owned(user_id: int, skip: int = 0, limit: int 
 
     return db_questions
 
+
 @router.get("/me/to_answer", response_model=List[schemas.QuestionShow])
 async def read_user_questions_to_answer(user_id: int, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 

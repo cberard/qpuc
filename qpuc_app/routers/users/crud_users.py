@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from qpuc_app.sql_database import models, schemas
 from sqlalchemy.orm import relationship, joinedload
-from qpuc_app.routers.authentification.utils_authentification import get_password_hash
+from qpuc_app.utils_authentification import get_password_hash
 
 
 ### user

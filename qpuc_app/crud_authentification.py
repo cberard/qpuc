@@ -1,9 +1,11 @@
 from sqlalchemy.orm import Session
 from qpuc_app.sql_database import models, schemas
 from qpuc_app.routers.users.crud_users import get_user_by_email
-from qpuc_app.routers.authentification.utils_authentification import verify_password
+from qpuc_app.utils_authentification import verify_password
 import jwt
+from jwt import PyJWTError
 from datetime import datetime, timedelta
+from qpuc_app.sql_database import schemas
 
 
 
@@ -25,6 +27,20 @@ def create_access_token(*, data: dict, secret_key:str, algorithm: str, expires_d
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, key=secret_key, algorithm=algorithm)
     return encoded_jwt
+
+
+def decode_access_token(token, secret_key:str, algorithm: str): 
+    try : 
+        payload = jwt.decode(token, secret_key, algorithms=[algorithm])
+        email: str = payload.get("sub")
+        token_data = schemas.TokenData(email=email)
+        if email :
+            return token_data
+    except PyJWTError:
+        return None
+    return None
+    
+
 
 
 
