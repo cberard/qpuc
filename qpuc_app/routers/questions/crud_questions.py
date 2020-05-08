@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session, relationship, joinedload
+from sqlalchemy.orm import Session, relationship, joinedload, join, contains_eager
 from datetime import date
 from qpuc_app.sql_database import models, schemas
 from sqlalchemy import asc, cast, Date, DateTime
@@ -57,6 +57,19 @@ def get_user_questions_not_owned(db: Session, user_id: int, skip: int=0, limit: 
 def get_user_questions_to_answer(db: Session, user_id: int, skip: int=0, limit: int=100): 
     db_answer_user_correct = db.query(models.GuessedAnswer.question_id).filter(models.GuessedAnswer.is_correct, models.GuessedAnswer.user_id==user_id)
     db_questions = db.query(models.Question).filter(models.Question.id.notin_(db_answer_user_correct), models.Question.owner_id!=user_id).options(joinedload('steps')).offset(skip).limit(limit).all()
+    return db_questions
+
+### Get Questions already answered by user
+def get_user_questions_answered(db: Session, user_id: int, skip: int=0, limit: int=100): 
+
+    db_answer_user_correct = db.query(models.GuessedAnswer.question_id).filter(models.GuessedAnswer.is_correct, models.GuessedAnswer.user_id==user_id)
+
+    db_questions = db.query(models.Question)\
+        .join(models.Question.answers)\
+        .filter(models.Answer.question_id.in_(db_answer_user_correct), models.Answer.is_principal, models.Question.id.in_(db_answer_user_correct))\
+        .options(contains_eager('answers'))\
+        .options(joinedload("steps"))\
+        .offset(skip).limit(limit).all()
     return db_questions
 
 ### Get Question of the day not answered by user

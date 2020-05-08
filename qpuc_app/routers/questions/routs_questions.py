@@ -34,10 +34,6 @@ def create_question_for_user(*,
     answers : List[schemas.AnswerCreate],
     db: Session = Depends(get_db)):
 
-    db_owner = crud_users.get_user(db=db, user_id=user.id)
-    if db_owner is None:
-        raise HTTPException(status_code=404, detail="User not found")
-
     question_length = len(steps)
     
     db_question = crud_questions.create_question(
@@ -50,13 +46,11 @@ def create_question_for_user(*,
         db_answer = crud_questions.create_answer_question(db=db, answer=answer, question_id=db_question.id)
     return db_question
 
+
 ## Get questions adapted to user
 @router.get("/me/owned", response_model=List[schemas.Question])
 async def read_owner_questions(*, owner:schemas.User = Depends(get_current_user), skip: int = 0,  limit: int = 100, db: Session = Depends(get_db)):
-    db_owner = crud_users.get_user(db=db, user_id=owner.id)
-    if db_owner is None:
-        raise HTTPException(status_code=404, detail="User not found")
-
+    
     db_questions = crud_questions.get_owner_questions(db=db, owner_id=owner.id, skip=skip, limit=limit)   
 
     return db_questions
@@ -64,10 +58,7 @@ async def read_owner_questions(*, owner:schemas.User = Depends(get_current_user)
 
 @router.get("/me/not_owned", response_model=List[schemas.QuestionShow])
 async def read_user_questions_not_owned(*, user: schemas.User = Depends(get_current_user), skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    db_owner = crud_users.get_user(db=db, user_id=user.id)
-    if db_owner is None:
-        raise HTTPException(status_code=404, detail="User not found")
-
+    
     db_questions = crud_questions.get_user_questions_not_owned(db=db, user_id=user.id, skip=skip, limit=limit)   
 
     return db_questions
@@ -76,11 +67,16 @@ async def read_user_questions_not_owned(*, user: schemas.User = Depends(get_curr
 @router.get("/me/to_answer", response_model=List[schemas.QuestionShow])
 async def read_user_questions_to_answer(*, user: schemas.User = Depends(get_current_user), skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
-    db_user= crud_users.get_user(db=db, user_id=user.id)
-    if db_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-
     db_questions = crud_questions.get_user_questions_to_answer(db=db, user_id=user.id, skip=skip, limit=limit)   
+
+    #return db_questions
+    return db_questions
+
+
+@router.get("/me/answered", response_model=List[schemas.Question])
+async def read_user_questions_answered(*, user: schemas.User = Depends(get_current_user), skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+
+    db_questions = crud_questions.get_user_questions_answered(db=db, user_id=user.id, skip=skip, limit=limit)   
 
     #return db_questions
     return db_questions
