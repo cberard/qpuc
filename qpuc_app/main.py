@@ -9,7 +9,7 @@ from qpuc_app.authentification import get_current_user
 from qpuc_app import crud_authentification, constants
 
 from qpuc_app.routers.users import routs_users 
-from qpuc_app.routers.questions import private_routs_questions, public_routs_questions
+from qpuc_app.routers.questions import routs_questions
 from qpuc_app.routers.answers import routs_answers
 from qpuc_app.routers.users.crud_users import get_user_by_email
 
@@ -61,11 +61,6 @@ async def login(*, form_data : OAuth2PasswordRequestForm=Depends(), db: Session=
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-@app.get("/users/me/", response_model=schemas.User)
-async def read_users_me(current_user: schemas.User = Depends(get_current_user)):
-    return current_user
-
-
 
 app.include_router(
     routs_users.router,
@@ -75,17 +70,10 @@ app.include_router(
 
 
 app.include_router(
-    public_routs_questions.router,
+    routs_questions.router,
     prefix="/questions",
     tags=["questions"])#,
     #dependencies=[Depends(get_token_header)],
-    #responses={404: {"description": "Not found"}})
-
-app.include_router(
-    private_routs_questions.router,
-    prefix="/questions",
-    tags=["questions"])#,
-    #dependencies=[Depends(get_current_user)],
     #responses={404: {"description": "Not found"}})
 
 
