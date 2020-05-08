@@ -5,10 +5,11 @@ from sqlalchemy.orm import Session
 
 from datetime import timedelta
 
+from qpuc_app.authentification import get_current_user
 from qpuc_app import crud_authentification, constants
 
 from qpuc_app.routers.users import routs_users 
-from qpuc_app.routers.questions import routs_questions
+from qpuc_app.routers.questions import private_routs_questions, public_routs_questions
 from qpuc_app.routers.answers import routs_answers
 from qpuc_app.routers.users.crud_users import get_user_by_email
 
@@ -16,7 +17,6 @@ from qpuc_app.sql_database import models, schemas
 from qpuc_app.sql_database.database import SessionLocal, engine
 from qpuc_app.sql_database.utils import get_db
 
-import jwt
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -24,8 +24,6 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 origins = ["*"]
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
 
 app.add_middleware(
@@ -63,22 +61,6 @@ async def login(*, form_data : OAuth2PasswordRequestForm=Depends(), db: Session=
     return {"access_token": access_token, "token_type": "bearer"}
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    token_data = crud_authentification.decode_access_token(token, secret_key=constants.SECRET_KEY, algorithm=constants.ALGORITHM)
-    if token_data is None : 
-        print('yolo')
-        raise credentials_exception
-    user = get_user_by_email(db=db, email=token_data.email)
-    if user is None:
-        print('user not found')
-        raise credentials_exception
-    return user
-
 @app.get("/users/me/", response_model=schemas.User)
 async def read_users_me(current_user: schemas.User = Depends(get_current_user)):
     return current_user
@@ -93,10 +75,17 @@ app.include_router(
 
 
 app.include_router(
-    routs_questions.router,
+    public_routs_questions.router,
     prefix="/questions",
     tags=["questions"])#,
     #dependencies=[Depends(get_token_header)],
+    #responses={404: {"description": "Not found"}})
+
+app.include_router(
+    private_routs_questions.router,
+    prefix="/questions",
+    tags=["questions"])#,
+    #dependencies=[Depends(get_current_user)],
     #responses={404: {"description": "Not found"}})
 
 
