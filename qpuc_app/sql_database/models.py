@@ -13,7 +13,7 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
-    if_redac = Column(Boolean, default=True)
+    is_redac = Column(Boolean, default=True)
 
     questions = relationship("Question", back_populates="owner")
     guessed_answers = relationship("GuessedAnswer", back_populates="user")

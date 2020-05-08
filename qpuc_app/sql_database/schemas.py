@@ -106,9 +106,9 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int = Field(...)
-    id_admin: bool = Field(False)
+    is_admin: bool = Field(False)
     is_active: bool = Field(True)
-    if_redac: bool = Field(True)
+    is_redac: bool = Field(True)
     questions: List[Question] = []
 
     class Config:
