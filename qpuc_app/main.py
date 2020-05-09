@@ -42,6 +42,7 @@ async def get_token_header(x_token: str = Header(...)):
 
 @app.post("/login", response_model=schemas.Token)
 async def login(*, form_data : OAuth2PasswordRequestForm=Depends(), db: Session=Depends(get_db)): 
+    print(form_data)
     db_user = crud_authentification.authentificate_user(db=db, email=form_data.username, password=form_data.password)
     if not db_user: 
         raise HTTPException(
