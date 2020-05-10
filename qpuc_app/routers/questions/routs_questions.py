@@ -44,6 +44,8 @@ def create_question_for_user(*,
         db_step = crud_questions.create_step_question(db=db, step=step, question_id=db_question.id)
     for answer in answers : 
         db_answer = crud_questions.create_answer_question(db=db, answer=answer, question_id=db_question.id)
+    print('yoloooooo')
+    
     return db_question
 
 
