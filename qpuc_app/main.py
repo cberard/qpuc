@@ -25,7 +25,7 @@ app = FastAPI()
 
 origins = ["*"]
 
-
+print('before middleware')
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -34,6 +34,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+print('after middleware')
 async def get_token_header(x_token: str = Header(...)):
     if x_token != "fake-super-secret-token":
         raise HTTPException(status_code=403, detail="X-Token header invalid")
@@ -69,7 +70,7 @@ app.include_router(
     tags=['users'])#, 
     #dependencies=[Depends(get_token_header)])
 
-
+print('befor  app include routs')
 app.include_router(
     routs_questions.router,
     prefix="/questions",
