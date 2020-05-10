@@ -24,7 +24,6 @@ def create_question(db: Session, question_length:int, owner_id:int):
     db.add(db_question)
     db.commit()
     db.refresh(db_question)
-    print(db_question.id)
     return db_question
 
 
